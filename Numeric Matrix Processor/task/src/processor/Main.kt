@@ -5,29 +5,21 @@ import java.util.*
 fun main() {
     val scanner = Scanner(System.`in`)
 
-    val aN = scanner.nextInt()
-    val aM = scanner.nextInt()
-    val sum = Array(aN) { IntArray(aM) }
+    val n = scanner.nextInt()
+    val m = scanner.nextInt()
+    val result = Array(n) { IntArray(m) }
 
-    for (i in 0 until aN) {
-        for (j in 0 until aM) {
-            sum[i][j] = scanner.nextInt()
+    for (i in 0 until n) {
+        for (j in 0 until m) {
+            result[i][j] = scanner.nextInt()
         }
     }
 
-    val bN = scanner.nextInt()
-    if (aN != bN) {
-        println("ERROR")
-        return
-    }
-    val bM = scanner.nextInt()
-    if (aM != bM) {
-        println("ERROR")
-        return
-    }
-    for (row in sum) {
+    val c = scanner.nextInt()
+
+    for (row in result) {
         for (elem in row) {
-            print("${elem + scanner.nextInt()} ")
+            print("${c * elem} ")
         }
         println()
     }
