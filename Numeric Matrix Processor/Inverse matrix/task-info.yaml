@@ -462,6 +462,13 @@ files:
 
     }
   learner_created: false
+- name: src/processor/Main.kt
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/87/stages/485/implement
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations! Continue on <a href="https://hyperskill.org/projects/87/stages/485/implement">JetBrains
+    Academy</a>
+  time: Sun, 05 Jul 2020 12:21:31 UTC
 record: -1

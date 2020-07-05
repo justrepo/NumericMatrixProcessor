@@ -1,6 +1,7 @@
 package processor
 
 import java.util.*
+import kotlin.math.abs
 
 val scanner = Scanner(System.`in`)
 
@@ -38,7 +39,7 @@ class Matrix(val n: Int, val m: Int) {
         println("The $name is :")
         for (row in data) {
             for (elem in row) {
-                print("$elem ")
+                print("%4.2f ".format(elem))
             }
             println()
         }
@@ -138,20 +139,21 @@ class Matrix(val n: Int, val m: Int) {
         return result
     }
 
-    private fun at(i: Int, j: Int, firstRemainingX: Int, remainingYs: List<Int>): Double = data[firstRemainingX + i][remainingYs[j]]
+    private fun at(i: Int, j: Int, remainingXs: List<Int>, remainingYs: List<Int>): Double =
+            data[remainingXs[i]][remainingYs[j]]
 
-    private fun determinant(firstRemainingX: Int, remainingYs: List<Int>): Double {
+    private fun determinant(remainingXs: List<Int>, remainingYs: List<Int>): Double {
         return when (remainingYs.size) {
             0 -> 0.0
-            1 -> at(0, 0, firstRemainingX, remainingYs)
-            2 -> at(0, 0, firstRemainingX, remainingYs) * at(1, 1, firstRemainingX, remainingYs) -
-                    at(1, 0, firstRemainingX, remainingYs) * at(0, 1, firstRemainingX, remainingYs)
+            1 -> at(0, 0, remainingXs, remainingYs)
+            2 -> at(0, 0, remainingXs, remainingYs) * at(1, 1, remainingXs, remainingYs) -
+                    at(1, 0, remainingXs, remainingYs) * at(0, 1, remainingXs, remainingYs)
             else -> {
                 var sum = 0.0
                 for (i in remainingYs.indices) {
                     sum += (if (i % 2 == 0) 1 else -1) *
-                            determinant(firstRemainingX + 1, remainingYs.filterIndexed { index, _ -> index != i }) *
-                            at(0, i, firstRemainingX, remainingYs)
+                            determinant(remainingXs.drop(1), remainingYs.filterIndexed { index, _ -> index != i }) *
+                            at(0, i, remainingXs, remainingYs)
                 }
                 sum
             }
@@ -166,8 +168,30 @@ class Matrix(val n: Int, val m: Int) {
         return when (n) {
             1 -> data[0][0]
             2 -> data[0][0] * data[1][1] - data[1][0] * data[0][1]
-            else -> determinant(0, List(n) { i -> i })
+            else -> determinant(List(n) { i -> i }, List(n) { i -> i })
         }
+    }
+
+    fun inverse(): Matrix {
+        if (n != m) {
+            print("ERROR")
+            return Matrix(0, 0)
+        }
+        val det = determinant()
+        if (abs(det) < 1e-10) {
+            print("ERROR")
+            return Matrix(0, 0)
+        }
+        val result = Matrix(n, n)
+        for (i in 0 until n) {
+            for (j in 0 until n) {
+                result.data[j][i] = (if ((i + j) % 2 == 0) 1 else -1) *
+                            determinant(List(n) { index -> index }.filterIndexed { index, _ -> index != i },
+                                List(n) { index -> index }.filterIndexed { index, _ -> index != j }) / det
+            }
+        }
+
+        return result
     }
 }
 
@@ -183,6 +207,7 @@ fun main() {
                 "3. Multiply matrices\n" +
                 "4. Transpose matrix\n" +
                 "5. Calculate a determinant\n" +
+                "6. Inverse matrix\n" +
                 "0. Exit\n" +
                 "Your choice: > ")
         val choice = scanner.nextInt()
@@ -204,6 +229,7 @@ fun main() {
                 }
             }
             5 -> println("The result is:\n${Matrix.read("matrix").determinant()}")
+            6 -> Matrix.read("matrix").inverse().printMatrix("result")
         }
     } while (choice != 0)
 }
