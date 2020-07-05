@@ -137,6 +137,38 @@ class Matrix(val n: Int, val m: Int) {
 
         return result
     }
+
+    private fun at(i: Int, j: Int, firstRemainingX: Int, remainingYs: List<Int>): Double = data[firstRemainingX + i][remainingYs[j]]
+
+    private fun determinant(firstRemainingX: Int, remainingYs: List<Int>): Double {
+        return when (remainingYs.size) {
+            0 -> 0.0
+            1 -> at(0, 0, firstRemainingX, remainingYs)
+            2 -> at(0, 0, firstRemainingX, remainingYs) * at(1, 1, firstRemainingX, remainingYs) -
+                    at(1, 0, firstRemainingX, remainingYs) * at(0, 1, firstRemainingX, remainingYs)
+            else -> {
+                var sum = 0.0
+                for (i in remainingYs.indices) {
+                    sum += (if (i % 2 == 0) 1 else -1) *
+                            determinant(firstRemainingX + 1, remainingYs.filterIndexed { index, _ -> index != i }) *
+                            at(0, i, firstRemainingX, remainingYs)
+                }
+                sum
+            }
+        }
+    }
+
+    fun determinant(): Double {
+        if (n != m) {
+            print("ERROR")
+            return 0.0
+        }
+        return when (n) {
+            1 -> data[0][0]
+            2 -> data[0][0] * data[1][1] - data[1][0] * data[0][1]
+            else -> determinant(0, List(n) { i -> i })
+        }
+    }
 }
 
 fun readDouble(name: String): Double {
@@ -150,6 +182,7 @@ fun main() {
                 "2. Multiply matrix to a constant\n" +
                 "3. Multiply matrices\n" +
                 "4. Transpose matrix\n" +
+                "5. Calculate a determinant\n" +
                 "0. Exit\n" +
                 "Your choice: > ")
         val choice = scanner.nextInt()
@@ -170,6 +203,7 @@ fun main() {
                     4 -> Matrix.read("matrix").horizontalLineTranspose().printMatrix("result")
                 }
             }
+            5 -> println("The result is:\n${Matrix.read("matrix").determinant()}")
         }
     } while (choice != 0)
 }
